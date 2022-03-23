@@ -283,7 +283,7 @@ const userRoute = (app) => {
       users.push(req.body) // vamos pegar esse objeto, que é um array de usuários e da push para inserir o corpo da requisição(que nada mais é que esse novo usuário);
       saveUser(users) // em seguida chamamos o método saveUser, que vai atualizar esse arquivo do BD;
 
-      res.status(201).send('Created') // resposta com o status code 201 Created
+      res.status(201).json(req.body) // resposta com o status code 201 Created
     })
 };
 
@@ -401,5 +401,77 @@ retorno =>
 OK
 ```
 
+#### Adicionando validação de Input de dados
 
-### COMO EXERCÍCIO VOU IMPLEMENTAR VALIDAÇÕES PARA ESSES DADOS AMANHÃ
+##### Criando o schema
+
+Não interessa se você estamos salvando os dados em um arquivo de texto, no MongoDB ou em um banco relacional como MySQL, vamos querer validar os inputs de dados que o usuário ou cliente da API enviou antes de persisti-los na base.
+
+Para fazer validações vamos usar o pacote **Joi**, um dos mais famosos para este fim na atualidade.
+
+```
+npm i joi --save
+```
+
+Quando estamos falando de web, é muito comum usar o padrão MVC (Model View Controller) ou alguma arquitetura inspirada nele. Neste padrão, temos uma camada da aplicação, a Model, responsável pela lógica de persistência dos dados, incluindo os schemas de validação.
+
+Sendo assim, vamos **criar uma pasta models** na raiz do projeto e **dentro dela adicionar um arquivo userSchema.js**.
+
+Nesse arquivo userSchema.js vamos importar o **Joi** e adicionar as validações:
+
+``` JavaScript
+const Joi = require('joi');
+
+module.exports = Joi.object({
+  id: Joi.number()
+    .required(),
+  name: Joi.string()
+    .min(3)
+    .required(),
+  email: Joi.string()
+    .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+});
+```
+
+Este módulo de validação retorna um objeto userSchema que usaremos em nossa rota da web API para validar a entrada de dados de usuários.
+
+##### Criando o middleware
+
+Agora que temos tudo configurado e criado, basta a gente adicionar a validação na nossa rota de POST e UPDATE.
+
+A rota POST espera no request.body os dados do usuário a ser salvo no banco de dados. Mas antes de executar o callback do POST, vamos adicionar uma chamada ao nosso userSchema, para ele validar o body da requisição usando um middleware Express. Middlewares no Express são como se fossem camadas intermediárias de processamento da requisição HTTP, ou seja, ao invés de um único callback para tratar request e response, nós dividimos a responsabilidade com outras funções para aumentar o reuso, diminuir a complexidade e aumentar a facilidade de manutenção.
+
+Vamos abrir o **routes/userRoutes.js** e além de adicionar mais um require ao userSchema, vamos adicionar o middleware abaixo.
+
+``` JavaScript
+const userSchema = require('../models/userSchema');
+
+const validationMiddleware = (request, response, next) => { //Middleware para validação dos dados
+  const { error } = userSchema.validate(request.body)
+  const valid = error == null; 
+ 
+  if (valid) { 
+    next(); 
+  } else { 
+    const { details } = error; 
+    const message = details.map(i => i.message).join(',');
+ 
+    console.log("error", message); 
+    response.status(422).json({ error: message })
+  } 
+}
+```
+Este middleware utiliza o userSchema para validar a request.body e se veio um erro, coleta e formata os detalhes, imprime no console e devolve em uma resposta HTTP 422 (uma especialização do 400 Bad Request que sinaliza Unprocessable Entity, que é o caso aqui).
+
+Para usar este middleware é muito simples, na rota POST deste mesmo routes/users.js, adicione o nome do middleware antes do callback tradicional.
+
+``` JavaScript
+.post(validationMiddleware, (req, res) => {
+      const users = getUsers()
+
+      users.push(req.body) 
+      saveUser(users) 
+
+      res.status(201).json(req.body)
+    })
+```

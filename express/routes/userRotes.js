@@ -1,8 +1,24 @@
 const fs = require('fs');
 const { join } = require('path');
-const { send } = require('process');
 
 const filePath = join(__dirname, 'users.json'); 
+
+const userSchema = require('../models/userSchema');
+
+const validationMiddleware = (request, response, next) => { //Middleware para validação dos dados
+  const { error } = userSchema.validate(request.body)
+  const valid = error == null; 
+ 
+  if (valid) { 
+    next(); 
+  } else { 
+    const { details } = error; 
+    const message = details.map(i => i.message).join(',');
+ 
+    console.log("error", message); 
+    response.status(422).json({ error: message })
+  } 
+}
 
 const getUsers = () => {
   const data = fs.existsSync(filePath) // existsSync: verifica se o arquico existe
@@ -29,17 +45,17 @@ const userRoute = (app) => { // app: a própria aplicação vai ser passada como
     })
 
     // POST localhost:4000/users
-    .post((req, res) => {
+    .post(validationMiddleware, (req, res) => {
       const users = getUsers()
 
       users.push(req.body) // vamos pegar esse objeto, que é um array de usuários e da push para inserir o corpo da requisição(que nada mais é que esse novo usuário)
       saveUser(users) //em seguida chamamos o método saveUser, que vai atualizar esse arquivo do BD
 
-      res.status(201).send('Created') // resposta com o status code 201 Created
+      res.status(201).json(req.body) // resposta com o status code 201 Created
     })
 
     // PUT localhost:4000/users/1
-    .put((req, res) => {
+    .put(validationMiddleware, (req, res) => {
       const users = getUsers();
 
       saveUser(users.map(user => { //vamos usar o map para ciar um novo objeto com as alterações;
@@ -52,7 +68,7 @@ const userRoute = (app) => { // app: a própria aplicação vai ser passada como
         return user // se não, só retorna o usuário atual
       }))
 
-      res.status(200).send('OK')
+      res.status(200).json(req.body)
     })
 
     // DELETE localhost:4000/users/1
