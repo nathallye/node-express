@@ -493,7 +493,6 @@ Para usar este middleware é muito simples, na rota POST deste mesmo routes/user
 - CLIS podem ser facilmente distribuídas e consumidas em múltiplas plataformas;
 - Explorar o ecossistema, incluindo sua grande quantidade de pacotes focados em CLI.
 
-
 ## Criação de templates com Pug
 
 ### O que é o Pug?
