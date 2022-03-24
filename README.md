@@ -475,3 +475,43 @@ Para usar este middleware é muito simples, na rota POST deste mesmo routes/user
       res.status(201).json(req.body)
     })
 ```
+
+## Desenvolvendo Ferramentas de Linha de Comando em Node.js
+
+
+### O que é uma CLI?
+
+- Ferramenta que disponibiliza uma interface de linha de comando para executar tarefas no terminal;
+- Normalmente são criadas através de Shell Script;
+- Automatiza uma tarefa através de um arquivo executável;
+- Pode ser facilmente distribuído em várias plataformas.
+
+### Por que criar uma CLI em Node.js?
+
+- A popularidade do Node.js se dá ao rico ecossistema de pacotes;
+- Mais de 900.000 pacotes registrados no NPM;
+- CLIS podem ser facilmente distribuídas e consumidas em múltiplas plataformas;
+- Explorar o ecossistema, incluindo sua grande quantidade de pacotes focados em CLI.
+
+
+## Criação de templates com Pug
+
+### O que é o Pug?
+
+- É uma template engine de alta performance;
+- Implementado com JavaScript para Node.js e Browsers;
+- Conhecido anteriormente como "Jade";
+- Pode ser integrado com Express.
+
+### Prós e Contras
+
+#### Prós
+
+- Escrever mais HTML com menos código;
+- Código parecido com parágrafos, o que a legibilidade do código e simplifica projetos com vários desenvolvedores;
+- Não há fechamento de tags. É usado indentação para identificar aninhamento de tags;
+- É possível escrever JavaScript dentro dos templates .pug.
+
+#### Contras
+- Espaços em branco importam - e muito! Um mínimo erro de indentação pode trazer grandes problemas para seu código;
+- Não é possível usar código HTML de qualquer lugar. É preciso converter para Pug antes de usar.# cli-com-nodejs
