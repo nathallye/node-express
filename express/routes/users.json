@@ -1,26 +1,4 @@
-[
-	{
-		"name": "maria",
-		"id": "2"
-	},
-	{
-		"name": "maria",
-		"id": "2"
-	},
-	{
-		"name": "maria",
-		"id": "2"
-	},
-	{
-		"name": "João Paulo da Silva",
-		"id": "5"
-	},
-	{
-		"name": "João Paulo da Silva",
-		"id": "5"
-	},
-	{
-		"name": "João Paulo da Silva",
-		"id": "8"
-	}
-]
+{
+	"count": 1,
+	"users": []
+}
